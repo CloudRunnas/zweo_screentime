@@ -139,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   Card(
                     child: SwitchListTile(
                       title: const Text('Überwachung aktiv'),
-                      subtitle: Text('Warnung nach ${settings.limitMinutes} min am Stück'),
+                      subtitle: Text('Bildschirmpause alle ${settings.limitMinutes} min am Stück'),
                       value: status.enabled,
                       onChanged: _busy ? null : _toggleMonitoring,
                     ),
@@ -157,12 +157,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           const SizedBox(height: 8),
                           _row('Dienst', _serviceText(status)),
                           _row('Sitzung seit', _time(status.sessionStartedAt)),
-                          _row(
-                            'Warnung um',
-                            status.warningDismissed
-                                ? 'bestätigt, erst nach erneutem Entsperren'
-                                : _time(status.nextWarningAt),
-                          ),
+                          _row('Nächste Warnung', _time(status.nextWarningAt)),
                           _row('Snooze', '${settings.snoozeMinutes} min'),
                           _row(
                             'Kulanzzeit',

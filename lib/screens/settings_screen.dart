@@ -128,7 +128,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 _NumberSetting(
                   title: 'Zeitlimit',
-                  description: 'Nach so vielen Minuten am Stück erscheint die Warnung.',
+                  description: 'Intervall: Nach so vielen Minuten am Stück erscheint die Warnung. '
+                      '„Verstanden“ startet das nächste Intervall.',
                   value: _limit,
                   min: ScreenTimeSettings.minLimitMinutes,
                   max: ScreenTimeSettings.maxLimitMinutes,

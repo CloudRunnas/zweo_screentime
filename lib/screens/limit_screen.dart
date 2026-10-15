@@ -103,7 +103,7 @@ class _LimitScreenState extends State<LimitScreen> with WidgetsBindingObserver {
                       ),
                       const Spacer(),
                       FilledButton(
-                        onPressed: _busy ? null : () => _close(ScreenTimeChannel.dismissWarning),
+                        onPressed: _busy ? null : () => _close(ScreenTimeChannel.acknowledgeWarning),
                         style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(56)),
                         child: const Text('Verstanden'),
                       ),

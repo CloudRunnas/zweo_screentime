@@ -4,8 +4,8 @@ Android-App (Flutter + nativer Kotlin-Dienst), die die **zusammenhängende Bilds
 
 - Beim **Entsperren** startet ein exakter Alarm mit dem eingestellten Zeitlimit.
 - Geht der **Bildschirm aus**, wird der Alarm abgebrochen. Wird innerhalb der **Kulanzzeit** wieder entsperrt, läuft die Sitzung weiter.
-- Ist das Limit erreicht, erscheint eine **Vollbild-Warnung** mit eigenem Titel/Text (`{minutes}` = Nutzungsdauer), mit „Noch X min“ und „Verstanden“.
-- Eine **Ersteinrichtung** prüft alle nötigen Geräte-Einstellungen (Ampel) und öffnet die passende Einstellungsseite.
+- **Intervall-Timer:** Ist das Limit erreicht, erscheint eine **Vollbild-Warnung** mit eigenem Titel/Text (`{minutes}` = Nutzungsdauer). „Verstanden“ startet das nächste Intervall (z. B. alle 20 min eine Bildschirmpause), „Noch X min“ verschiebt die Warnung, eine ignorierte Warnung kommt nach der Snooze-Dauer erneut.
+- Eine **Ersteinrichtung** prüft alle nötigen Geräte-Einstellungen (Ampel) und öffnet die passende Einstellungsseite – inkl. Xiaomi „Sonstige Berechtigungen“.
 
 ## Architektur
 

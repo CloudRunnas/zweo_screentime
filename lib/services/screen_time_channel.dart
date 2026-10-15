@@ -48,21 +48,18 @@ class MonitoringStatus {
     required this.serviceRunning,
     required this.sessionStartedAt,
     required this.nextWarningAt,
-    required this.warningDismissed,
   });
 
   final bool enabled;
   final bool serviceRunning;
   final DateTime? sessionStartedAt;
   final DateTime? nextWarningAt;
-  final bool warningDismissed;
 
   factory MonitoringStatus.fromMap(Map<String, dynamic> map) => MonitoringStatus(
         enabled: map['enabled'] as bool,
         serviceRunning: map['serviceRunning'] as bool,
         sessionStartedAt: _date(map['sessionStartedAt']),
         nextWarningAt: _date(map['nextWarningAt']),
-        warningDismissed: map['warningDismissed'] as bool,
       );
 
   static DateTime? _date(Object? millis) =>
@@ -145,7 +142,8 @@ class ScreenTimeChannel {
   // Warning screen
   static Future<WarningInfo> getWarning() async => WarningInfo.fromMap(await _map('getWarning'));
   static Future<void> snooze() => _channel.invokeMethod<void>('snooze');
-  static Future<void> dismissWarning() => _channel.invokeMethod<void>('dismissWarning');
+  /// "Verstanden": restarts the interval timer.
+  static Future<void> acknowledgeWarning() => _channel.invokeMethod<void>('acknowledgeWarning');
   static Future<void> previewWarning() => _channel.invokeMethod<void>('previewWarning');
 
   // Device checks
@@ -182,6 +180,11 @@ class ScreenTimeChannel {
       _ => HibernationStatus.notApplicable,
     };
   }
+
+  /// Xiaomi "Sonstige Berechtigungen": true/false if readable, null if the ROM hides it.
+  static Future<bool?> getMiuiOtherPermissionsStatus() =>
+      _channel.invokeMethod<bool>('getMiuiOtherPermissionsStatus');
+  static Future<bool> openMiuiOtherPermissions() => _bool('openMiuiOtherPermissions');
 
   /// Returns true if an OEM autostart page was opened, false for the app details fallback.
   static Future<bool> openAutostartSettings() async =>

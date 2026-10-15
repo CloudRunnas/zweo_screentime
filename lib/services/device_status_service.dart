@@ -5,7 +5,16 @@ import 'setup_store.dart';
 
 enum CheckLevel { ok, warn, error }
 
-enum CheckId { notifications, exactAlarms, overlay, fullScreen, battery, hibernation, autostart }
+enum CheckId {
+  notifications,
+  exactAlarms,
+  overlay,
+  fullScreen,
+  battery,
+  hibernation,
+  otherPermissions,
+  autostart,
+}
 
 class DeviceCheck {
   const DeviceCheck({
@@ -17,6 +26,7 @@ class DeviceCheck {
     this.action,
     this.helpUrl,
     this.acknowledged,
+    this.onAcknowledged,
   });
 
   final CheckId id;
@@ -31,6 +41,7 @@ class DeviceCheck {
 
   /// Non-null for checks that cannot be verified and need a manual confirmation.
   final bool? acknowledged;
+  final Future<void> Function(bool value)? onAcknowledged;
 }
 
 class _Oem {
@@ -191,6 +202,29 @@ class DeviceStatusService {
     }
 
     final oem = _oemFor(device.manufacturer);
+    if (oem?.slug == 'xiaomi') {
+      final status = await ScreenTimeChannel.getMiuiOtherPermissionsStatus();
+      final acknowledged = await SetupStore.isOtherPermissionsAcknowledged();
+      final ok = status == true || acknowledged;
+      checks.add(DeviceCheck(
+        id: CheckId.otherPermissions,
+        title: 'Sonstige Berechtigungen (Xiaomi)',
+        description: 'App-Info → Sonstige Berechtigungen: alle Einträge erlauben, vor allem '
+            '„Pop-up-Fenster anzeigen, während im Hintergrund ausgeführt“, '
+            '„Auf Sperrbildschirm anzeigen“ und „Pop-up-Fenster anzeigen“. '
+            'Ohne sie startet die Warnung im Hintergrund nicht.',
+        level: ok
+            ? CheckLevel.ok
+            : status == false
+                ? CheckLevel.error
+                : CheckLevel.warn,
+        actionLabel: status == true ? null : 'Einstellung öffnen',
+        action: status == true ? null : ScreenTimeChannel.openMiuiOtherPermissions,
+        acknowledged: status == true ? null : acknowledged,
+        onAcknowledged: SetupStore.setOtherPermissionsAcknowledged,
+      ));
+    }
+
     if (oem != null) {
       final acknowledged = await SetupStore.isAutostartAcknowledged();
       checks.add(DeviceCheck(
@@ -205,6 +239,7 @@ class DeviceStatusService {
         },
         helpUrl: Uri.parse('https://dontkillmyapp.com/${oem.slug}'),
         acknowledged: acknowledged,
+        onAcknowledged: SetupStore.setAutostartAcknowledged,
       ));
     }
 

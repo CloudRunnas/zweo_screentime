@@ -35,6 +35,7 @@ object Prefs {
     private const val KEY_TEXT = "warningText"
     private const val KEY_SESSION_START = "sessionStartedAt"
     private const val KEY_DEADLINE = "deadline"
+    private const val KEY_INTERVAL_START = "intervalStartedAt"
     private const val KEY_SCREEN_OFF = "screenOffAt"
 
     private fun prefs(ctx: Context): SharedPreferences =
@@ -91,17 +92,20 @@ object Prefs {
     // another component (receiver, service) always sees the new value.
     fun sessionStartedAt(ctx: Context) = prefs(ctx).getLong(KEY_SESSION_START, 0L)
     fun deadline(ctx: Context) = prefs(ctx).getLong(KEY_DEADLINE, 0L)
+    fun intervalStartedAt(ctx: Context) = prefs(ctx).getLong(KEY_INTERVAL_START, 0L)
     fun screenOffAt(ctx: Context) = prefs(ctx).getLong(KEY_SCREEN_OFF, 0L)
 
     fun setSession(
         ctx: Context,
         sessionStartedAt: Long = Prefs.sessionStartedAt(ctx),
         deadline: Long = Prefs.deadline(ctx),
+        intervalStartedAt: Long = Prefs.intervalStartedAt(ctx),
         screenOffAt: Long = Prefs.screenOffAt(ctx),
     ) {
         prefs(ctx).edit()
             .putLong(KEY_SESSION_START, sessionStartedAt)
             .putLong(KEY_DEADLINE, deadline)
+            .putLong(KEY_INTERVAL_START, intervalStartedAt)
             .putLong(KEY_SCREEN_OFF, screenOffAt)
             .commit()
     }

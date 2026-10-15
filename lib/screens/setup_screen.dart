@@ -62,8 +62,8 @@ class _SetupScreenState extends State<SetupScreen> with WidgetsBindingObserver {
     await _load();
   }
 
-  Future<void> _setAcknowledged(bool value) async {
-    await SetupStore.setAutostartAcknowledged(value);
+  Future<void> _setAcknowledged(DeviceCheck check, bool value) async {
+    await check.onAcknowledged?.call(value);
     await _load();
   }
 
@@ -133,7 +133,7 @@ class _SetupScreenState extends State<SetupScreen> with WidgetsBindingObserver {
                       for (final check in checks) _CheckCard(
                         check: check,
                         onAction: () => _runAction(check),
-                        onAcknowledged: _setAcknowledged,
+                        onAcknowledged: (value) => _setAcknowledged(check, value),
                       ),
                     ],
                   ),

@@ -7,16 +7,15 @@ import android.os.SystemClock
 import android.util.Log
 
 /**
- * Usage session logic.
+ * Usage session logic (interval timer).
  *
- * A session starts when the user unlocks the phone. Its deadline is when the warning is due.
- * Screen off cancels the alarm; unlocking again within the grace period resumes the session
- * (the pause counts as usage), otherwise a new session starts.
+ * A session starts when the user unlocks the phone. Every interval of `limitMinutes` ends with a
+ * warning (deadline). "Verstanden" starts the next interval, "Noch X min" postpones the warning,
+ * an ignored warning repeats after the snooze time. Screen off cancels the alarm; unlocking again
+ * within the grace period resumes the session (the pause counts as usage), otherwise a new
+ * session starts.
  */
 object Session {
-    /** Deadline value meaning "warning acknowledged, no further alarm in this session". */
-    const val DISMISSED = -1L
-
     private fun now() = SystemClock.elapsedRealtime()
 
     /** Screen is on and the keyguard is not shown. */
@@ -42,7 +41,13 @@ object Session {
         } else {
             val deadline = now + Prefs.limitMinutes(ctx) * 60_000L
             Log.i(TAG, "new session, warning in ${Prefs.limitMinutes(ctx)} min")
-            Prefs.setSession(ctx, sessionStartedAt = now, deadline = deadline, screenOffAt = 0L)
+            Prefs.setSession(
+                ctx,
+                sessionStartedAt = now,
+                deadline = deadline,
+                intervalStartedAt = now,
+                screenOffAt = 0L,
+            )
         }
         scheduleDeadline(ctx)
     }
@@ -65,17 +70,18 @@ object Session {
         Log.i(TAG, "snoozed for ${Prefs.snoozeMinutes(ctx)} min")
     }
 
-    fun dismiss(ctx: Context) {
-        Prefs.setSession(ctx, deadline = DISMISSED)
-        AlarmScheduler.cancel(ctx)
-        Log.i(TAG, "warning dismissed until next session")
+    /** "Verstanden": the interval timer restarts, next warning after the full limit. */
+    fun acknowledge(ctx: Context) {
+        val now = now()
+        Prefs.setSession(ctx, deadline = now + Prefs.limitMinutes(ctx) * 60_000L, intervalStartedAt = now)
+        scheduleDeadline(ctx)
+        Log.i(TAG, "warning acknowledged, next interval of ${Prefs.limitMinutes(ctx)} min started")
     }
 
-    /** The limit applies immediately to a running session (US-18). */
+    /** The limit applies immediately to the running interval (US-18). */
     fun onLimitChanged(ctx: Context) {
         if (!Prefs.isEnabled(ctx) || !isRunning(ctx)) return
-        if (Prefs.deadline(ctx) == DISMISSED) return
-        val deadline = Prefs.sessionStartedAt(ctx) + Prefs.limitMinutes(ctx) * 60_000L
+        val deadline = Prefs.intervalStartedAt(ctx) + Prefs.limitMinutes(ctx) * 60_000L
         Prefs.setSession(ctx, deadline = deadline)
         scheduleDeadline(ctx)
         Log.i(TAG, "limit changed, deadline recalculated")
@@ -83,7 +89,7 @@ object Session {
 
     fun reset(ctx: Context) {
         AlarmScheduler.cancel(ctx)
-        Prefs.setSession(ctx, sessionStartedAt = 0L, deadline = 0L, screenOffAt = 0L)
+        Prefs.setSession(ctx, sessionStartedAt = 0L, deadline = 0L, intervalStartedAt = 0L, screenOffAt = 0L)
     }
 
     /** A session is running while the screen is on and unlocked. */

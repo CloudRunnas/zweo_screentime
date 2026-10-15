@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SetupStore {
   static const _keySetupCompleted = 'setupCompleted';
   static const _keyAutostartAcknowledged = 'autostartAcknowledged';
+  static const _keyOtherPermissionsAcknowledged = 'otherPermissionsAcknowledged';
 
   static final _prefs = SharedPreferencesAsync();
 
@@ -18,4 +19,10 @@ class SetupStore {
 
   static Future<void> setAutostartAcknowledged(bool value) =>
       _prefs.setBool(_keyAutostartAcknowledged, value);
+
+  static Future<bool> isOtherPermissionsAcknowledged() async =>
+      await _prefs.getBool(_keyOtherPermissionsAcknowledged) ?? false;
+
+  static Future<void> setOtherPermissionsAcknowledged(bool value) =>
+      _prefs.setBool(_keyOtherPermissionsAcknowledged, value);
 }

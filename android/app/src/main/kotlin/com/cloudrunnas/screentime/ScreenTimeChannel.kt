@@ -2,6 +2,7 @@ package com.cloudrunnas.screentime
 
 import android.Manifest
 import android.app.Activity
+import android.app.AppOpsManager
 import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.Context
@@ -9,6 +10,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
+import android.os.Process
 import android.provider.Settings
 import android.util.Log
 import androidx.core.app.ActivityCompat
@@ -98,7 +100,6 @@ class ScreenTimeChannel private constructor(private val activity: Activity) : Me
                             "serviceRunning" to ScreenTimeService.isRunning,
                             "sessionStartedAt" to if (running) Session.toEpochMillis(Prefs.sessionStartedAt(ctx)) else null,
                             "nextWarningAt" to if (running && deadline > 0) Session.toEpochMillis(deadline) else null,
-                            "warningDismissed" to (running && deadline == Session.DISMISSED),
                         )
                     )
                 }
@@ -119,9 +120,9 @@ class ScreenTimeChannel private constructor(private val activity: Activity) : Me
                     Session.snooze(ctx)
                     result.success(null)
                 }
-                "dismissWarning" -> {
+                "acknowledgeWarning" -> {
                     Notifications.cancelWarning(ctx)
-                    Session.dismiss(ctx)
+                    Session.acknowledge(ctx)
                     result.success(null)
                 }
                 "previewWarning" -> {
@@ -167,6 +168,8 @@ class ScreenTimeChannel private constructor(private val activity: Activity) : Me
                 "getHibernationStatus" -> result.success(hibernationStatus())
                 "openHibernationSettings" -> result.success(openHibernationSettings())
                 "openAutostartSettings" -> result.success(openAutostartSettings())
+                "getMiuiOtherPermissionsStatus" -> result.success(miuiOtherPermissionsStatus())
+                "openMiuiOtherPermissions" -> result.success(openMiuiOtherPermissions())
                 "openAppDetails" -> result.success(openAppDetails())
                 else -> result.notImplemented()
             }
@@ -237,6 +240,39 @@ class ScreenTimeChannel private constructor(private val activity: Activity) : Me
             start(Intent("android.intent.action.AUTO_REVOKE_PERMISSIONS", packageUri))
         ) return true
         return openAppDetails()
+    }
+
+    /**
+     * Xiaomi (MIUI/HyperOS) "Sonstige Berechtigungen": background pop-ups (op 10021) and
+     * show on lock screen (op 10020) are vendor app-ops. Best effort via reflection:
+     * true/false if readable, null if the ROM does not allow reading them.
+     */
+    private fun miuiOtherPermissionsStatus(): Boolean? = try {
+        val appOps = ctx.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+        val check = AppOpsManager::class.java.getMethod(
+            "checkOpNoThrow", Int::class.javaPrimitiveType, Int::class.javaPrimitiveType, String::class.java
+        )
+        listOf(10021, 10020).all { op ->
+            check.invoke(appOps, op, Process.myUid(), ctx.packageName) == AppOpsManager.MODE_ALLOWED
+        }
+    } catch (e: Exception) {
+        Log.w(TAG, "MIUI app-ops not readable", e)
+        null
+    }
+
+    private fun openMiuiOtherPermissions(): Boolean {
+        val editor = Intent("miui.intent.action.APP_PERM_EDITOR").putExtra("extra_pkgname", ctx.packageName)
+        return start(
+            Intent(editor).setClassName(
+                "com.miui.securitycenter",
+                "com.miui.permcenter.permissions.PermissionsEditorActivity",
+            )
+        ) || start(
+            Intent(editor).setClassName(
+                "com.miui.securitycenter",
+                "com.miui.permcenter.permissions.AppPermissionsEditorActivity",
+            )
+        ) || start(editor) || openAppDetails()
     }
 
     /** Returns "autostart" if an OEM page was opened, "appDetails" for the fallback. */
