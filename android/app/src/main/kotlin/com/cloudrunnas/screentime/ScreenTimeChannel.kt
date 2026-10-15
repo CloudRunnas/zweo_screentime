@@ -98,14 +98,14 @@ class ScreenTimeChannel private constructor(private val activity: Activity) : Me
                         mapOf(
                             "enabled" to Prefs.isEnabled(ctx),
                             "serviceRunning" to ScreenTimeService.isRunning,
-                            "sessionStartedAt" to if (running) Session.toEpochMillis(Prefs.sessionStartedAt(ctx)) else null,
+                            "intervalStartedAt" to if (running) Session.toEpochMillis(Prefs.intervalStartedAt(ctx)) else null,
                             "nextWarningAt" to if (running && deadline > 0) Session.toEpochMillis(deadline) else null,
                         )
                     )
                 }
                 "getWarning" -> {
                     val preview = activity.intent?.getBooleanExtra(EXTRA_PREVIEW, false) ?: false
-                    val minutes = if (preview) Prefs.limitMinutes(ctx).toLong() else Session.elapsedMinutes(ctx)
+                    val minutes = if (preview) Prefs.limitMinutes(ctx).toLong() else Session.intervalMinutes(ctx)
                     result.success(
                         mapOf(
                             "title" to Prefs.warningTitle(ctx),

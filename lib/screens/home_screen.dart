@@ -120,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('zweo_screentime'),
+        title: const Text('Zweos Screentime'),
         actions: [
           IconButton(
             tooltip: 'Einstellungen',
@@ -156,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           Text('Status', style: theme.textTheme.titleMedium),
                           const SizedBox(height: 8),
                           _row('Dienst', _serviceText(status)),
-                          _row('Sitzung seit', _time(status.sessionStartedAt)),
+                          _row('Intervall seit', _time(status.intervalStartedAt)),
                           _row('Nächste Warnung', _time(status.nextWarningAt)),
                           _row('Snooze', '${settings.snoozeMinutes} min'),
                           _row(

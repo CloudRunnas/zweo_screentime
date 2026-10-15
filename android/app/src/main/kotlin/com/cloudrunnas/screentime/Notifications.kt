@@ -90,7 +90,7 @@ object Notifications {
             activityIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
-        val text = Prefs.formatWarningText(ctx, Session.elapsedMinutes(ctx))
+        val text = Prefs.formatWarningText(ctx, Session.intervalMinutes(ctx))
         val notification = NotificationCompat.Builder(ctx, CHANNEL_WARNING)
             .setSmallIcon(R.drawable.ic_stat_timer)
             .setContentTitle(Prefs.warningTitle(ctx))

@@ -1,10 +1,10 @@
-# zweo_screentime
+# Zweos Screentime
 
 Android-App (Flutter + nativer Kotlin-Dienst), die die **zusammenhängende Bildschirmzeit** begrenzt – komplett offline.
 
 - Beim **Entsperren** startet ein exakter Alarm mit dem eingestellten Zeitlimit.
 - Geht der **Bildschirm aus**, wird der Alarm abgebrochen. Wird innerhalb der **Kulanzzeit** wieder entsperrt, läuft die Sitzung weiter.
-- **Intervall-Timer:** Ist das Limit erreicht, erscheint eine **Vollbild-Warnung** mit eigenem Titel/Text (`{minutes}` = Nutzungsdauer). „Verstanden“ startet das nächste Intervall (z. B. alle 20 min eine Bildschirmpause), „Noch X min“ verschiebt die Warnung, eine ignorierte Warnung kommt nach der Snooze-Dauer erneut.
+- **Intervall-Timer:** Ist das Limit erreicht, erscheint eine **Vollbild-Warnung** mit eigenem Titel/Text (`{minutes}` = Minuten seit Beginn des aktuellen Intervalls). „Verstanden“ startet das nächste Intervall (z. B. alle 20 min eine Bildschirmpause), „Noch X min“ verschiebt die Warnung, eine ignorierte Warnung kommt nach der Snooze-Dauer erneut.
 - Eine **Ersteinrichtung** prüft alle nötigen Geräte-Einstellungen (Ampel) und öffnet die passende Einstellungsseite – inkl. Xiaomi „Sonstige Berechtigungen“.
 
 ## Architektur

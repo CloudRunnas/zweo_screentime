@@ -176,7 +176,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   decoration: InputDecoration(
                     labelText: 'Text der Warnung',
                     hintText: settings.defaultWarningText,
-                    helperText: '{minutes} wird durch die Nutzungsdauer ersetzt. Leer = Standardtext',
+                    helperText: '{minutes} = Minuten seit Beginn des Intervalls. Leer = Standardtext',
                     helperMaxLines: 2,
                     border: const OutlineInputBorder(),
                   ),

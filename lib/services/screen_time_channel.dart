@@ -46,19 +46,20 @@ class MonitoringStatus {
   const MonitoringStatus({
     required this.enabled,
     required this.serviceRunning,
-    required this.sessionStartedAt,
+    required this.intervalStartedAt,
     required this.nextWarningAt,
   });
 
   final bool enabled;
   final bool serviceRunning;
-  final DateTime? sessionStartedAt;
+  /// Start of the current interval (unlock or last "Verstanden").
+  final DateTime? intervalStartedAt;
   final DateTime? nextWarningAt;
 
   factory MonitoringStatus.fromMap(Map<String, dynamic> map) => MonitoringStatus(
         enabled: map['enabled'] as bool,
         serviceRunning: map['serviceRunning'] as bool,
-        sessionStartedAt: _date(map['sessionStartedAt']),
+        intervalStartedAt: _date(map['intervalStartedAt']),
         nextWarningAt: _date(map['nextWarningAt']),
       );
 

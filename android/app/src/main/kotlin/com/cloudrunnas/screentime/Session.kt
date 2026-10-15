@@ -98,10 +98,14 @@ object Session {
         return start in 1..now() && Prefs.screenOffAt(ctx) == 0L
     }
 
-    fun elapsedMinutes(ctx: Context): Long {
-        val start = Prefs.sessionStartedAt(ctx)
+    /**
+     * Minutes since the current interval started (unlock or last "Verstanden"), shown as
+     * {minutes} in the warning. Rounded so a warning at the deadline shows exactly the limit.
+     */
+    fun intervalMinutes(ctx: Context): Long {
+        val start = Prefs.intervalStartedAt(ctx)
         if (start <= 0L) return 0L
-        return ((now() - start) / 60_000L).coerceAtLeast(0L)
+        return ((now() - start + 30_000L) / 60_000L).coerceAtLeast(0L)
     }
 
     /** Elapsed-realtime value converted to epoch millis for the UI, null if unset. */

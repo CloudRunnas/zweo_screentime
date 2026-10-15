@@ -34,7 +34,7 @@ class _App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'zweo_screentime',
+        title: 'Zweos Screentime',
         theme: _theme(Brightness.light),
         darkTheme: _theme(Brightness.dark),
         // Ignore the platform route ("/limit"); the home widget is chosen in main().
